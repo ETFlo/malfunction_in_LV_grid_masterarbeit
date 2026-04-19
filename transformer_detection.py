@@ -41,6 +41,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.decomposition import PCA
 
 class Transformer_detection:
 
@@ -902,6 +904,15 @@ class Transformer_detection:
                 # print('Split #%d' % (len(scores) + 1))
                 X_train, X_test = X[train_index], X[test_index]
                 y_train, y_test = np.array(y)[train_index], np.array(y)[test_index]
+
+                if data_mode == 'combined_data':
+                    # Fit scaler and PCA only on training data to prevent data leakage.
+                    scaler = MinMaxScaler()
+                    X_train = scaler.fit_transform(X_train)
+                    X_test = scaler.transform(X_test)
+                    pca = PCA(n_components=learning_config['components'])
+                    X_train = pca.fit_transform(X_train)
+                    X_test = pca.transform(X_test)
 
                 if clf == 'SVM' or clf == 'NuSVM':
                     y_pred, y_test = self.svm_algorithm([X_train, X_test, y_train, y_test], SVM_type=clf, cross_val=True,

@@ -319,8 +319,10 @@ class Combined_Dataset:
 
     def create_dataset(self):
 
-        scaled_data = Combined_Dataset.scale(self)
-        pca_data = Combined_Dataset.PCA(self, n_components=learning_config['components'])
+        # Set raw (unscaled) features as X so that Scaler and PCA can be fitted
+        # exclusively on training data inside each cross-validation fold, avoiding
+        # data leakage that would occur when fitting on the full dataset.
+        self.X = self.combined_data.values
         labelled_data = Combined_Dataset.label(self)
 
     def dataset_info(self):
@@ -333,7 +335,9 @@ class Combined_Dataset:
 
     def label(self):
 
-        self.X = np.array(self.principalComponents_selection)
+        # self.X must already be set (to raw combined_data) before this method is called.
+        # Do NOT overwrite self.X here with PCA output – scaling and PCA are now applied
+        # per fold inside cross-validation to prevent data leakage.
 
         """self.X = np.array([self.data[measurement] for measurement in self.data if
                            measurement[-2:] == self.name.split('_')[2] and measurement.split(' ')[3] == self.name.split('_')[
