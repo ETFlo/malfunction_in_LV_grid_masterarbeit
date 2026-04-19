@@ -319,14 +319,16 @@ class Combined_Dataset:
             # Szenarien per Präfix (ohne Baymessstelle) zusammenführen
             measurements = {}
             for f2_key in f2_flat:
-                f1_key = f2_key[:-2] + 'F1'
+                f1_key = f2_key.replace(': Test Bay F2', ': Test Bay F1')
                 if f1_key in f1_flat:
                     merged_row = pd.concat([f2_flat[f2_key][0], f1_flat[f1_key][0]], axis=1)
                     measurements[f2_key] = (merged_row,)
 
             # self.data auf Szenarien beschränken, für die beide Bays vorhanden sind
             self.data = {m: data[m] for m in measurements}
-            # Label-Methode arbeitet mit F2-Schlüsseln – bay überschreiben
+            # Die Label-Methode iteriert über self.data und filtert anhand self.bay.
+            # Da die Schlüssel in self.data F2-Messnamen sind (z. B. "... Test Bay F2"),
+            # wird self.bay auf 'F2' gesetzt, damit der Filter in label() greift.
             self.bay = 'F2'
 
         else:
