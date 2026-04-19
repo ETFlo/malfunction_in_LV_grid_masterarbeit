@@ -31,7 +31,7 @@ use_case = 'detection'
 # Deep learning settings
 learning_config = {
     'data_source': 'real_world', #real_world, simulation
-    'setup_chosen' : 'Setup_A_F1F2_data',  # for assembly or clustering
+    'setup_chosen' : 'Setup_A_F1_data',  # for assembly or clustering
     'mode' : 'classification',  # classification means wrong as wrong and inversed as inversed, detection means wrong and inversed as wrong
     'data_mode' : 'combined_data',  # 'measurement_wise', 'combined_data'
     'selection' : 'most important', # 'most important', 'least important' variables picked after assessment by PCA > only applicable when in measurement_wise data mode
@@ -91,7 +91,8 @@ if extended:
               'Setup_B_F2_data2_2c': ['correct', 'wrong'],
               'Setup_B_F2_data3_2c': ['correct', 'inversed']}
 else:
-    setups = {'Setup_A_F2_data': ['correct', 'wrong'], 'Setup_A_F1F2_data': ['correct', 'wrong'],
+    setups = {'Setup_A_F2_data': ['correct', 'wrong'], 'Setup_A_F1_data': ['correct', 'wrong'],
+              'Setup_A_F1F2_data': ['correct', 'wrong'],
               'Setup_B_F2_data1_3c': ['correct', 'wrong', 'inversed'],
               'Setup_B_F2_data2_2c': ['correct', 'wrong'], 'Setup_B_F2_data3_2c': ['correct', 'inversed']}
 
