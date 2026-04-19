@@ -592,7 +592,7 @@ class Transformer_detection:
                 classes = config.setups[learning_config['setup_chosen']['stmk']]
                 classes = classes.remove('as_is')
                 variables = ['mean voltage p.u.', 'P', 'Q']
-            else: trafo_point = 'F2'
+            else: trafo_point = self.setup_chosen.split('_')[2]
 
             if isinstance(learning_config['setup_chosen'], dict) and list(learning_config['setup_chosen'].keys())[0] == 'stmk': #list(learning_config['setup_chosen'].keys())[0] == 'stmk':
                 data = create_dataset(type='combined', data=data, variables=variables,
