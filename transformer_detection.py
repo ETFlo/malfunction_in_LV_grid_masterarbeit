@@ -594,6 +594,8 @@ class Transformer_detection:
                 variables = ['mean voltage p.u.', 'P', 'Q']
             elif isinstance(self.setup_chosen, str) and self.setup_chosen.split('_')[2] == 'F1F2':
                 trafo_point = 'F1F2'
+            elif isinstance(self.setup_chosen, str) and self.setup_chosen.split('_')[2] == 'F1':
+                trafo_point = 'F1'
             else: trafo_point = 'F2'
 
             if isinstance(learning_config['setup_chosen'], dict) and list(learning_config['setup_chosen'].keys())[0] == 'stmk': #list(learning_config['setup_chosen'].keys())[0] == 'stmk':
