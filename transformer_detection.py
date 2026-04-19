@@ -310,10 +310,10 @@ class Transformer_detection:
                                     measurements[measurement].index(scenario)] + '.csv'),
                                 sep=',',
                                 decimal=',', low_memory=False)
-                            data = data[
-                                   2 * 60 * 4:]  # cut off the first 2 minutes because this is where laods / PV where started up
-                            data = data[
-                                   :6000]  # cut off after 25 minutes (25*60*4 bc 4 samples per second) because measurements were not turned off at same time
+                            #data = data[
+                            #       2 * 60 * 4:]  # cut off the first 2 minutes because this is where laods / PV where started up
+                            #data = data[
+                            #       :6000]  # cut off after 25 minutes (25*60*4 bc 4 samples per second) because measurements were not turned off at same time
                             data['new_index'] = range(len(data))
                             data = data.set_index('new_index')
 
