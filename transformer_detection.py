@@ -310,10 +310,10 @@ class Transformer_detection:
                                     measurements[measurement].index(scenario)] + '.csv'),
                                 sep=',',
                                 decimal=',', low_memory=False)
-                            data = data[
-                                   2 * 60 * 4:]  # cut off the first 2 minutes because this is where laods / PV where started up
-                            data = data[
-                                   :6000]  # cut off after 25 minutes (25*60*4 bc 4 samples per second) because measurements were not turned off at same time
+                            #data = data[
+                            #       2 * 60 * 4:]  # cut off the first 2 minutes because this is where laods / PV where started up
+                            #data = data[
+                            #       :6000]  # cut off after 25 minutes (25*60*4 bc 4 samples per second) because measurements were not turned off at same time
                             data['new_index'] = range(len(data))
                             data = data.set_index('new_index')
 
@@ -869,7 +869,7 @@ class Transformer_detection:
             X = data.X
             y = data.y
             # kf = KFold(n_splits=7, shuffle=True)
-            kf = StratifiedKFold(n_splits=5, # Florian Liszt -> steht eigentlich 7 drin
+            kf = StratifiedKFold(n_splits=7, # Florian Liszt -> steht eigentlich 7 drin
                                  shuffle=True)  # ensures balanced classes in batches!! (as much as possible) > important
         if clf == 'Assembly' and data_mode == 'measurement_wise':
             variables = data
