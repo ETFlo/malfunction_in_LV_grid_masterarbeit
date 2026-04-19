@@ -294,6 +294,41 @@ class Combined_Dataset:
             self.data = {applicable_measurements.name: data[applicable_measurements.name] for applicable_measurements in
                          [data[measurement] for measurement in measurements if measurements[measurement][0].values.shape[1] == len(measurements[list(measurements.keys())[0]][0].columns)]}  # get rid of daylight saving time change flawed data day
 
+        elif name.split('_')[2] == 'F1F2':
+            # Kombiniert F1- (Smart Meter) und F2- (Ortsnetztrafo) Daten horizontal pro Szenario.
+            # variables muss ein Dict sein: {'F1': [...], 'F2': [...]}.
+            setup_label = name.split('_')[1]
+            f1_flat = {}
+            f2_flat = {}
+            for measurement in data:
+                if measurement.split(' ')[3] == setup_label and \
+                        measurement.split(' ')[0] in self.classes:
+                    if measurement[-2:] == 'F2':
+                        bay_vars = variables['F2']
+                        reduced = pd.DataFrame(index=data[measurement].data.index,
+                                               data=data[measurement].data[bay_vars].values,
+                                               columns=['F2_' + c for c in bay_vars])
+                        f2_flat[measurement] = Combined_Dataset.flatten_df_into_row(self, reduced)
+                    elif measurement[-2:] == 'F1':
+                        bay_vars = variables['F1']
+                        reduced = pd.DataFrame(index=data[measurement].data.index,
+                                               data=data[measurement].data[bay_vars].values,
+                                               columns=['F1_' + c for c in bay_vars])
+                        f1_flat[measurement] = Combined_Dataset.flatten_df_into_row(self, reduced)
+
+            # Szenarien per Präfix (ohne Baymessstelle) zusammenführen
+            measurements = {}
+            for f2_key in f2_flat:
+                f1_key = f2_key[:-2] + 'F1'
+                if f1_key in f1_flat:
+                    merged_row = pd.concat([f2_flat[f2_key][0], f1_flat[f1_key][0]], axis=1)
+                    measurements[f2_key] = (merged_row,)
+
+            # self.data auf Szenarien beschränken, für die beide Bays vorhanden sind
+            self.data = {m: data[m] for m in measurements}
+            # Label-Methode arbeitet mit F2-Schlüsseln – bay überschreiben
+            self.bay = 'F2'
+
         else:
             self.data = {applicable_measurements.name: data[applicable_measurements.name] for applicable_measurements in
                          [data[measurement] for measurement in data if

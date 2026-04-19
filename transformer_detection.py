@@ -592,6 +592,8 @@ class Transformer_detection:
                 classes = config.setups[learning_config['setup_chosen']['stmk']]
                 classes = classes.remove('as_is')
                 variables = ['mean voltage p.u.', 'P', 'Q']
+            elif isinstance(self.setup_chosen, str) and self.setup_chosen.split('_')[2] == 'F1F2':
+                trafo_point = 'F1F2'
             else: trafo_point = 'F2'
 
             if isinstance(learning_config['setup_chosen'], dict) and list(learning_config['setup_chosen'].keys())[0] == 'stmk': #list(learning_config['setup_chosen'].keys())[0] == 'stmk':
@@ -604,9 +606,12 @@ class Transformer_detection:
             # Florian Liszt: Dynamisches Laden aus detection_method_settings.py
             else:
                 
-                # Wählt automatisch die richtige Variablen-Liste aus den Settings (F1 oder F2)
+                # Wählt automatisch die richtige Variablen-Liste aus den Settings (F1, F2 oder F1+F2)
                 if trafo_point == 'F1':
                     dynamische_variablen = v.pca_variables_F1
+                elif trafo_point == 'F1F2':
+                    # Beide Messstellen kombiniert: Dict mit je einer Variablenliste pro Bay
+                    dynamische_variablen = {'F1': v.pca_variables_F1, 'F2': v.pca_variables_F2}
                 else:
                     dynamische_variablen = v.pca_variables_F2
 
