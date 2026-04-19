@@ -1,0 +1,3 @@
+The outcomes of the analysis of the voltage data provided in combined_7days_A_c_ai_ready.csv are:
+The connection point has a PV (probability: 51.18%)
+The PV at the connection point has a malfunction! (probability: 51.32%)
