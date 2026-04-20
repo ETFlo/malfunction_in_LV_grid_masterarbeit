@@ -31,7 +31,7 @@ use_case = 'detection'
 # Deep learning settings
 learning_config = {
     'data_source': 'real_world', #real_world, simulation
-    'setup_chosen' : 'Setup_A_F1_data',  # for assembly or clustering # Setup_A_F2_data oder Setup_A_F1_data
+    'setup_chosen' : 'Setup_A_F2_data',  # for assembly or clustering # Setup_A_F2_data oder Setup_A_F1_data
     'mode' : 'classification',  # classification means wrong as wrong and inversed as inversed, detection means wrong and inversed as wrong
     'data_mode' : 'combined_data',  # 'measurement_wise', 'combined_data'
     'selection' : 'most important', # 'most important', 'least important' variables picked after assessment by PCA > only applicable when in measurement_wise data mode
@@ -45,7 +45,6 @@ learning_config = {
     'classifier_combos' : 'general', # detection, c_vs_w, c_vs_inv, A, c_vs_w_combined_dataset not all work for all!
     'components' : 0.99, #for combined dataset: percentage of variance that is to be retained by primary components
     'crop_data_to_pv_daytime': False
-    #'k folds' : 5 # Florian
 }
 
 #########################################################################
