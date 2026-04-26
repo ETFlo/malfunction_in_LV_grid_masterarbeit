@@ -868,8 +868,8 @@ class Transformer_detection:
         if clf != 'Assembly' or data_mode == 'combined_data':
             X = data.X
             y = data.y
-            # kf = KFold(n_splits=7, shuffle=True)
-            kf = StratifiedKFold(n_splits=7, # Florian Liszt -> steht eigentlich 7 drin
+            #kf = KFold(n_splits=4, shuffle=True)
+            kf = StratifiedKFold(n_splits=4, # Florian Liszt -> steht eigentlich 7 drin
                                  shuffle=True)  # ensures balanced classes in batches!! (as much as possible) > important
         if clf == 'Assembly' and data_mode == 'measurement_wise':
             variables = data

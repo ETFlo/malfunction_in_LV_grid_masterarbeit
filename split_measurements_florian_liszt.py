@@ -4,12 +4,11 @@ import os
 # Florian Liszt: Masterarbeit
 # output_{Nummer}_{Setup}_{Klasse}.csv
 # --- KONFIGURATION ---
-num_scenarios = 19       # Anzahl der Szenarien (1 bis 19)
+num_scenarios = 7       # Anzahl der Szenarien (1 bis 19)
 setups = ['A']      # Welche Setups existieren?
 labels = ['c', 'w'] # c = correct, w = wrong, i = inversed
 
 # Pfad zu dem Ordner, in dem deine kombinierten Dateien liegen.
-# (Achte darauf, ob der Ordner MASTER oder MASTERS heißt!)
 base_folder = 'raw_data/MASTER_THESIS_DATASET'
 
 # Erstelle die Ziel-Ordner (Test_Bay_F1 und F2) IN dem Dataset-Ordner, falls sie noch nicht existieren
@@ -21,7 +20,8 @@ for i in range(1, num_scenarios + 1):
     for setup in setups:
         for label in labels:
             # Generiere den Dateinamen, z.B. "output_4_A_c.csv"
-            file_name = f"output_{i}_{setup}_{label}.csv"
+            #file_name = f"output_{i}_{setup}_{label}.csv"
+            file_name = f"output_20_{i}_{setup}_{label}.csv"
             
             # Der vollständige Pfad zur kombinierten Datei
             source_path = os.path.join(base_folder, file_name)

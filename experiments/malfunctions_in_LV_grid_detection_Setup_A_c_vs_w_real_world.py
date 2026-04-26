@@ -13,7 +13,7 @@ insert conclusio
 dev_mode = False
 grid_data_folder = os.path.join(os.getcwd(), 'raw_data_generation', 'input')
 raw_data_folder = os.path.join(os.getcwd(), 'raw_data')
-data_path = os.path.join(os.getcwd(), raw_data_folder, 'MASTER_THESIS_DATASET')
+data_path = os.path.join(os.getcwd(), raw_data_folder, 'MASTER_THESIS_DATASET_feature_engineering')
 sim_data_path = os.path.join(os.getcwd(), raw_data_folder, 'ERIGrid_phase_1_sim_data')
 datasets_folder = os.path.join(os.getcwd(), 'datasets')
 test_data_folder = os.path.join(os.getcwd(), 'test')
@@ -31,7 +31,7 @@ use_case = 'detection'
 # Deep learning settings
 learning_config = {
     'data_source': 'real_world', #real_world, simulation
-    'setup_chosen' : 'Setup_A_F1_data',  # for assembly or clustering # Setup_A_F2_data oder Setup_A_F1_data
+    'setup_chosen' : 'Setup_A_F1_data',  # for assembly or clustering # Setup_A_F2_data -> Trafo oder Setup_A_F1_data -> Smart Meter
     'mode' : 'classification',  # classification means wrong as wrong and inversed as inversed, detection means wrong and inversed as wrong
     'data_mode' : 'combined_data',  # 'measurement_wise', 'combined_data'
     'selection' : 'most important', # 'most important', 'least important' variables picked after assessment by PCA > only applicable when in measurement_wise data mode
@@ -43,8 +43,8 @@ learning_config = {
     'neighbours' : [i + 1 for i in range(5)],   #for kNN
     'weights' : ['uniform', 'distance'],        #for kNN
     'classifier_combos' : 'general', # detection, c_vs_w, c_vs_inv, A, c_vs_w_combined_dataset not all work for all!
-    'components' : 0.99, #for combined dataset: percentage of variance that is to be retained by primary components
-    'crop_data_to_pv_daytime': True
+    'components' : 0.99,    #5, #for combined dataset: percentage of variance that is to be retained by primary components
+    'crop_data_to_pv_daytime': True     # crop data in Dataset.py to daytime when PV generation is present (10:00 to 18:00) to only use data with PV generation for training, testing and detection
 }
 
 #########################################################################

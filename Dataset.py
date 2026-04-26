@@ -417,7 +417,7 @@ class Combined_Dataset:
         # Florian Liszt: Habe die Zeilen auskommentiert, da sonst die Ausführung nicht funktioniert; es werden sowieso nur die Tageszeiten mit PV-Erzeugung betrachtet, sodass die fehlerhaften Daten der Zeitumstellung nicht mehr enthalten sind
         #if config.learning_config['crop_data_to_pv_daytime']:
         if config.learning_config.get('crop_data_to_pv_daytime', False):
-            df = df.loc[15:30]
+            df = df.loc[10:30]
         v = df.unstack().to_frame().sort_index(level=1).T
         v.columns = v.columns.map(str)
 
