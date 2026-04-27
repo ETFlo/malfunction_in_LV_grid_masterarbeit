@@ -28,8 +28,10 @@ measurements = {
         'output_13_A_c', 'output_14_A_c', 'output_15_A_c',
         'output_16_A_c', 'output_17_A_c', 'output_18_A_c',
         'output_19_A_c', 
-        'output_20_1_A_c','output_20_2_A_c',
-        'output_20_3_A_c', 'output_20_4_A_c','output_20_5_A_c',
+        # 'output_20_1_A_c',  # auskommentiert: ΔP ≈ 1W, korrekt und fehlerhaft nicht unterscheidbar (P(U) nicht aktiv)
+        'output_20_2_A_c',
+        # 'output_20_3_A_c',  # auskommentiert: ΔP ≈ 1W, korrekt und fehlerhaft nicht unterscheidbar (P(U) nicht aktiv)
+        'output_20_4_A_c','output_20_5_A_c',
         'output_20_6_A_c','output_20_7_A_c',
         'output_21_A_c', 'output_22_A_c'
     ],
@@ -41,8 +43,10 @@ measurements = {
         'output_13_A_w', 'output_14_A_w', 'output_15_A_w',
         'output_16_A_w', 'output_17_A_w', 'output_18_A_w',
         'output_19_A_w',
-        'output_20_1_A_w','output_20_2_A_w',
-        'output_20_3_A_w', 'output_20_4_A_w','output_20_5_A_w',
+        # 'output_20_1_A_w',  # auskommentiert: ΔP ≈ 1W, korrekt und fehlerhaft nicht unterscheidbar (P(U) nicht aktiv)
+        'output_20_2_A_w',
+        # 'output_20_3_A_w',  # auskommentiert: ΔP ≈ 1W, korrekt und fehlerhaft nicht unterscheidbar (P(U) nicht aktiv)
+        'output_20_4_A_w','output_20_5_A_w',
         'output_20_6_A_w','output_20_7_A_w', 
         'output_21_A_w', 'output_22_A_w'
     ]
