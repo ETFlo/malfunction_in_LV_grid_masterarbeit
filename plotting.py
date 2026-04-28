@@ -159,3 +159,222 @@ def plot_estimate_vs_target_by_load(y, y_pred_nn, y_pred_lr, style='-', phase='p
                 figname=figure_name + '_Q', style=style)
 
 
+def plot_dataset_comparison(scores_per_dataset, dataset_labels, save=False, figname=None):
+    """Compare classifier performance metrics across two or more datasets.
+
+    Creates a **grouped bar chart** (mean ± 2σ) and **box plots** for the
+    four metrics Accuracy, Precision, Recall and FScore.  All fold values
+    from all classifier combos are pooled per dataset.
+
+    Parameters
+    ----------
+    scores_per_dataset : dict
+        ``{dataset_label: [scores_dict, ...]}`` where each *scores_dict* is
+        the dict returned by ``cross_val()`` containing lists of per-fold
+        values for every metric.
+    dataset_labels : list of str
+        Ordered list of keys present in *scores_per_dataset*.
+    save : bool
+        Whether to save the figures to disk.
+    figname : str or None
+        Base file path (without extension) used when *save* is True.
+        ``'_bar.{png,pdf}'`` and ``'_boxplot.{png,pdf}'`` are appended.
+
+    Returns
+    -------
+    fig_bar : matplotlib.figure.Figure
+    fig_box : matplotlib.figure.Figure
+    """
+    metrics = ['Accuracy', 'Precision', 'Recall', 'FScore']
+
+    # Aggregate all fold values per metric per dataset (pool across all combos)
+    aggregated = {}
+    for ds_label in dataset_labels:
+        agg = {m: [] for m in metrics}
+        for scores_dict in scores_per_dataset[ds_label]:
+            for m in metrics:
+                agg[m].extend(scores_dict[m])
+        aggregated[ds_label] = agg
+
+    n_datasets = len(dataset_labels)
+    n_metrics = len(metrics)
+    x = np.arange(n_metrics)
+    width = 0.8 / n_datasets
+
+    # --- Grouped bar chart ---
+    fig_bar, ax_bar = plt.subplots(figsize=(10, 6))
+    for i, ds_label in enumerate(dataset_labels):
+        means = [np.mean(aggregated[ds_label][m]) for m in metrics]
+        stds = [np.std(aggregated[ds_label][m]) * 2 for m in metrics]
+        offset = (i - n_datasets / 2 + 0.5) * width
+        ax_bar.bar(x + offset, means, width, label=ds_label, yerr=stds, capsize=4)
+
+    ax_bar.set_xlabel('Metric')
+    ax_bar.set_ylabel('Score')
+    ax_bar.set_title('Dataset Performance Comparison (mean ± 2σ across all classifiers and folds)')
+    ax_bar.set_xticks(x)
+    ax_bar.set_xticklabels(metrics)
+    ax_bar.set_ylim(0, 1.15)
+    ax_bar.legend(loc='lower right')
+    ax_bar.grid(axis='y', linestyle='--', alpha=0.5)
+    fig_bar.tight_layout()
+
+    if save and figname:
+        fig_bar.savefig(figname + '_bar.png', dpi=fig_bar.dpi, bbox_inches='tight')
+        fig_bar.savefig(figname + '_bar.pdf', dpi=fig_bar.dpi, bbox_inches='tight', format='pdf')
+
+    # --- Box plots ---
+    fig_box, axes_box = plt.subplots(1, n_metrics, figsize=(4 * n_metrics, 6), sharey=True)
+    if n_metrics == 1:
+        axes_box = [axes_box]
+
+    for ax, metric in zip(axes_box, metrics):
+        data_for_box = [aggregated[ds_label][metric] for ds_label in dataset_labels]
+        ax.boxplot(data_for_box, labels=dataset_labels, patch_artist=True)
+        ax.set_title(metric)
+        ax.set_ylabel('Score')
+        ax.set_ylim(0, 1.1)
+        ax.tick_params(axis='x', rotation=15)
+        ax.grid(axis='y', linestyle='--', alpha=0.5)
+
+    fig_box.suptitle('Dataset Performance Comparison – Score Distributions across Classifiers and Folds')
+    fig_box.tight_layout()
+
+    if save and figname:
+        fig_box.savefig(figname + '_boxplot.png', dpi=fig_box.dpi, bbox_inches='tight')
+        fig_box.savefig(figname + '_boxplot.pdf', dpi=fig_box.dpi, bbox_inches='tight', format='pdf')
+
+    return fig_bar, fig_box
+
+
+def plot_pca_scatter_comparison(datasets_dict, dataset_labels, class_names=None, save=False, figname=None):
+    """Side-by-side 2D PCA scatter plots for each dataset.
+
+    Uses the first two principal components already stored in the
+    ``Combined_Dataset.X`` attribute after ``create_dataset()`` was called.
+
+    Parameters
+    ----------
+    datasets_dict : dict
+        ``{dataset_label: Combined_Dataset_object}`` – each object must expose
+        ``.X`` (PCA-transformed, shape ``(n_samples, n_components)``) and
+        ``.y`` (integer class labels).
+    dataset_labels : list of str
+    class_names : list of str or None
+        Human-readable class names (e.g. ``['correct', 'wrong']``).
+    save : bool
+    figname : str or None
+        Base file path; ``'.{png,pdf}'`` is appended.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+    """
+    if class_names is None:
+        class_names = ['correct', 'wrong']
+
+    n_datasets = len(dataset_labels)
+    fig, axes = plt.subplots(1, n_datasets, figsize=(7 * n_datasets, 6))
+    if n_datasets == 1:
+        axes = [axes]
+
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+    for ax, ds_label in zip(axes, dataset_labels):
+        dataset = datasets_dict[ds_label]
+        X = dataset.X
+        y = dataset.y
+
+        pc2 = X[:, 1] if X.shape[1] > 1 else np.zeros(len(X))
+        for class_idx, class_name in enumerate(class_names):
+            mask = np.array(y) == class_idx
+            ax.scatter(
+                X[mask, 0],
+                pc2[mask],
+                label=class_name,
+                alpha=0.7,
+                s=30,
+                color=colors[class_idx % len(colors)]
+            )
+
+        ax.set_title(f'PCA Scatter – {ds_label}')
+        ax.set_xlabel('PC 1')
+        ax.set_ylabel('PC 2')
+        ax.legend(loc='best')
+        ax.grid(linestyle='--', alpha=0.4)
+
+    fig.suptitle('PCA 2D Scatter Comparison across Datasets')
+    fig.tight_layout()
+
+    if save and figname:
+        fig.savefig(figname + '.png', dpi=fig.dpi, bbox_inches='tight')
+        fig.savefig(figname + '.pdf', dpi=fig.dpi, bbox_inches='tight', format='pdf')
+
+    return fig
+
+
+def plot_confusion_matrices_comparison(predictions_per_dataset, dataset_labels, class_names=None,
+                                       save=False, figname=None):
+    """Side-by-side normalised confusion-matrix heatmaps for each dataset.
+
+    Parameters
+    ----------
+    predictions_per_dataset : dict
+        ``{dataset_label: (y_pred_all, y_test_all)}`` – both lists contain
+        integer class indices aggregated across all cross-validation folds.
+    dataset_labels : list of str
+    class_names : list of str or None
+    save : bool
+    figname : str or None
+        Base file path; ``'.{png,pdf}'`` is appended.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+    """
+    from sklearn.metrics import confusion_matrix as sk_confusion_matrix
+
+    if class_names is None:
+        class_names = ['correct', 'wrong']
+
+    n_datasets = len(dataset_labels)
+    fig, axes = plt.subplots(1, n_datasets, figsize=(5 * n_datasets, 5))
+    if n_datasets == 1:
+        axes = [axes]
+
+    for ax, ds_label in zip(axes, dataset_labels):
+        y_pred, y_test = predictions_per_dataset[ds_label]
+        if len(y_pred) == 0:
+            ax.set_title(f'Confusion Matrix – {ds_label}\n(no data)')
+            continue
+
+        cm = sk_confusion_matrix(y_test, y_pred)
+        row_sums = cm.sum(axis=1, keepdims=True)
+        cm_norm = np.where(row_sums == 0, 0, cm.astype(float) / row_sums)
+
+        im = ax.imshow(cm_norm, interpolation='nearest', cmap='Blues', vmin=0, vmax=1)
+        ax.set_title(f'Confusion Matrix – {ds_label}')
+        ax.set_xlabel('Predicted label')
+        ax.set_ylabel('True label')
+        ax.set_xticks(range(len(class_names)))
+        ax.set_yticks(range(len(class_names)))
+        ax.set_xticklabels(class_names)
+        ax.set_yticklabels(class_names)
+        plt.colorbar(im, ax=ax)
+
+        thresh = 0.5
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                ax.text(j, i, f'{cm[i, j]}\n({cm_norm[i, j]:.2f})',
+                        ha='center', va='center',
+                        color='white' if cm_norm[i, j] > thresh else 'black')
+
+    fig.suptitle('Confusion Matrices Comparison across Datasets')
+    fig.tight_layout()
+
+    if save and figname:
+        fig.savefig(figname + '.png', dpi=fig.dpi, bbox_inches='tight')
+        fig.savefig(figname + '.pdf', dpi=fig.dpi, bbox_inches='tight', format='pdf')
+
+    return fig
+

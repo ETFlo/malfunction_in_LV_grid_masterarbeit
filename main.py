@@ -230,7 +230,48 @@ if __name__ == '__main__':  # see config file for settings
         if detection.plot_data: detection.plotting_data()
         if detection.approach == 'clustering': detection.clustering()
         if detection.approach == 'PCA+clf':
-            detection.detection()
+            if getattr(config, 'compare_datasets', False) and getattr(config, 'dataset_paths_for_comparison', None):
+                # Run detection on each dataset in turn and collect results for comparison.
+                all_dataset_scores = {}
+                all_dataset_objects = {}
+                all_dataset_predictions = {}
+                for ds_label, ds_path in config.dataset_paths_for_comparison.items():
+                    print(f'\n===== Running detection on dataset: {ds_label} =====\n')
+                    result = detection.run_detection_with_dataset(ds_path)
+                    if result is not None:
+                        all_scores, dataset_obj, y_pred_all, y_test_all = result
+                        all_dataset_scores[ds_label] = all_scores
+                        all_dataset_objects[ds_label] = dataset_obj
+                        all_dataset_predictions[ds_label] = (y_pred_all, y_test_all)
+
+                if all_dataset_scores:
+                    class_names = config.setups.get(learning_config['setup_chosen'], ['correct', 'wrong'])
+                    figdir = os.path.join(config.raw_data_folder, 'dataset_comparison')
+                    os.makedirs(figdir, exist_ok=True)
+                    ds_labels = list(all_dataset_scores.keys())
+
+                    plotting.plot_dataset_comparison(
+                        all_dataset_scores,
+                        ds_labels,
+                        save=config.save_figures,
+                        figname=os.path.join(figdir, 'metrics_comparison')
+                    )
+                    plotting.plot_pca_scatter_comparison(
+                        all_dataset_objects,
+                        ds_labels,
+                        class_names=class_names,
+                        save=config.save_figures,
+                        figname=os.path.join(figdir, 'pca_scatter_comparison')
+                    )
+                    plotting.plot_confusion_matrices_comparison(
+                        all_dataset_predictions,
+                        ds_labels,
+                        class_names=class_names,
+                        save=config.save_figures,
+                        figname=os.path.join(figdir, 'confusion_matrices_comparison')
+                    )
+            else:
+                detection.detection()
 
         """elif config.disaggregation:
             disaggregation = Disaggregation(config, learning_config)

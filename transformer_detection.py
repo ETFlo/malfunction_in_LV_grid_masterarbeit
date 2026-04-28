@@ -628,12 +628,24 @@ class Transformer_detection:
                 print(
                     f"\n########## % of predictions on {self.setup_chosen['stmk']} PV NAP data with classes {self.setups[self.setup_chosen['stmk']]} by classifier used ##########")
 
-            for classifiers in self.classifier_combos:
+            all_scores = []
+            collected_y_pred = []
+            collected_y_test = []
+            for combo_idx, classifiers in enumerate(self.classifier_combos):
 
-                scores = self.cross_val(data, clf=self.clf, classifiers_and_parameters=classifiers,
-                                        setup=self.setup_chosen,
-                                        mode=self.mode, sampling=self.sampling_step_size_in_seconds,
-                                        data_mode=self.data_mode)
+                if combo_idx == 0:
+                    cross_val_result = self.cross_val(data, clf=self.clf, classifiers_and_parameters=classifiers,
+                                                      setup=self.setup_chosen,
+                                                      mode=self.mode, sampling=self.sampling_step_size_in_seconds,
+                                                      data_mode=self.data_mode, return_predictions=True)
+                    scores, collected_y_pred, collected_y_test = cross_val_result
+                else:
+                    scores = self.cross_val(data, clf=self.clf, classifiers_and_parameters=classifiers,
+                                            setup=self.setup_chosen,
+                                            mode=self.mode, sampling=self.sampling_step_size_in_seconds,
+                                            data_mode=self.data_mode)
+
+                all_scores.append(scores)
 
                 if isinstance(learning_config['setup_chosen'], dict) and list(learning_config['setup_chosen'].keys())[0] == 'stmk': #list(learning_config['setup_chosen'].keys())[0] == 'stmk':
                     print(
@@ -650,12 +662,33 @@ class Transformer_detection:
                         print("%s: %0.2f (+/- %0.2f)" % (
                             score, np.array(scores[score]).mean(), np.array(scores[score]).std() * 2))
 
+            return (all_scores, data, collected_y_pred, collected_y_test)
+
         ##########
 
         # results_kpca = pca(variables=variables, PCA_type='kPCA', sampling=sampling_step_size_in_seconds)
         # fgs_kpca, axs_kpca = pca_plotting(results_kpca, type='kPCA')
 
     # results_ssa = ssa()
+
+    def run_detection_with_dataset(self, data_path):
+        """Run detection() with a temporary data_path override.
+
+        Temporarily replaces ``self.data_path`` with *data_path*, executes
+        ``detection()``, restores the original path, and returns the result.
+
+        Returns:
+            tuple: ``(all_scores, dataset, y_pred_all, y_test_all)`` as
+                returned by ``detection()`` in combined_data mode, or ``None``
+                for other modes.
+        """
+        original_data_path = self.data_path
+        self.data_path = data_path
+        try:
+            result = self.detection()
+        finally:
+            self.data_path = original_data_path
+        return result
 
     def pca(self, variables=None, PCA_type='PCA', analyse=False, n_components=2, data=None, sampling=None):
         if learning_config['data_source'] == 'simulation':
@@ -861,7 +894,8 @@ class Transformer_detection:
 
     def cross_val(self, data, clf='SVM', kernel='linear', neighbours=2, weights='uniform', degree=3,
                   classifiers_and_parameters=None,
-                  setup='Setup_B_F2_data1_3c', mode='classification', sampling=None, data_mode='measurement_wise'):
+                  setup='Setup_B_F2_data1_3c', mode='classification', sampling=None, data_mode='measurement_wise',
+                  return_predictions=False):
         if classifiers_and_parameters is None:
             classifiers_and_parameters = {'SVM': {'poly': [8]}, 'NuSVM': {'linear': [9], 'poly': [11], 'rbf': [2]},
                                           'kNN': {3: [18, 'uniform']}}
@@ -882,6 +916,8 @@ class Transformer_detection:
             kf = StratifiedKFold(n_splits=7,
                                  shuffle=True)  # ensures balanced classes in batches!! (as much as possible) > important
         scores = []
+        all_y_pred_collected = []
+        all_y_test_collected = []
 
         if isinstance(setup, dict) and 'stmk' in setup.keys():
 
@@ -903,6 +939,7 @@ class Transformer_detection:
                 X_train, X_test = X[train_index], X[test_index]
                 y_train, y_test = np.array(y)[train_index], np.array(y)[test_index]
 
+                y_pred = None
                 if clf == 'SVM' or clf == 'NuSVM':
                     y_pred, y_test = self.svm_algorithm([X_train, X_test, y_train, y_test], SVM_type=clf, cross_val=True,
                                                         kernel=kernel, degree=degree)
@@ -924,9 +961,15 @@ class Transformer_detection:
                 else:
                     print('undefined classifier entered')
 
+                if return_predictions and y_pred is not None:
+                    all_y_pred_collected.extend(list(y_pred))
+                    all_y_test_collected.extend(list(y_test))
+
             scores_dict = {'Accuracy': [i[0] for i in scores], 'Precision': [i[1][0] for i in scores],
                            'Recall': [i[1][1] for i in scores], 'FScore': [i[1][2] for i in scores]}
 
+        if return_predictions:
+            return scores_dict, all_y_pred_collected, all_y_test_collected
         return scores_dict
 
     def assembly_learner_single_dataset(self, data, clf_types_and_paras, cross_val=False, variables=None):

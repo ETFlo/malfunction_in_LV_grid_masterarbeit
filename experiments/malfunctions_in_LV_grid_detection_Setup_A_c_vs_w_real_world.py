@@ -149,3 +149,12 @@ whole_year = True  # if True malfunction is present from start of simulation on;
 """
 # t_start = pd.Timestamp('2017-01-01 00:00:00', tz='utc')                                 # example for custom sim time
 # t_end = pd.Timestamp('2018-01-01 00:00:00', tz='utc') - pd.Timedelta(step_size + 'T')
+
+# Dataset comparison settings
+# Set compare_datasets = True to compare the performance of multiple datasets side by side.
+# dataset_paths_for_comparison maps a short display label to the full path of each dataset.
+compare_datasets = True
+dataset_paths_for_comparison = {
+    'MASTER_THESIS_DATASET': os.path.join(os.getcwd(), raw_data_folder, 'MASTER_THESIS_DATASET'),
+    'MASTER_THESIS_DATASET_feature_engineering': os.path.join(os.getcwd(), raw_data_folder, 'MASTER_THESIS_DATASET_feature_engineering'),
+}
