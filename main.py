@@ -245,7 +245,9 @@ if __name__ == '__main__':  # see config file for settings
                         all_dataset_predictions[ds_label] = (y_pred_all, y_test_all)
 
                 if all_dataset_scores:
-                    class_names = config.setups.get(learning_config['setup_chosen'], ['correct', 'wrong'])
+                    setup_chosen = learning_config['setup_chosen']
+                    setup_key = list(setup_chosen.values())[0] if isinstance(setup_chosen, dict) else setup_chosen
+                    class_names = config.setups.get(setup_key, ['correct', 'wrong'])
                     figdir = os.path.join(config.raw_data_folder, 'dataset_comparison')
                     os.makedirs(figdir, exist_ok=True)
                     ds_labels = list(all_dataset_scores.keys())

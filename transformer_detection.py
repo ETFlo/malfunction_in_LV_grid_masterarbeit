@@ -629,8 +629,8 @@ class Transformer_detection:
                     f"\n########## % of predictions on {self.setup_chosen['stmk']} PV NAP data with classes {self.setups[self.setup_chosen['stmk']]} by classifier used ##########")
 
             all_scores = []
-            collected_y_pred = []
-            collected_y_test = []
+            y_pred_all = []
+            y_test_all = []
             for combo_idx, classifiers in enumerate(self.classifier_combos):
 
                 if combo_idx == 0:
@@ -638,7 +638,7 @@ class Transformer_detection:
                                                       setup=self.setup_chosen,
                                                       mode=self.mode, sampling=self.sampling_step_size_in_seconds,
                                                       data_mode=self.data_mode, return_predictions=True)
-                    scores, collected_y_pred, collected_y_test = cross_val_result
+                    scores, y_pred_all, y_test_all = cross_val_result
                 else:
                     scores = self.cross_val(data, clf=self.clf, classifiers_and_parameters=classifiers,
                                             setup=self.setup_chosen,
@@ -662,7 +662,7 @@ class Transformer_detection:
                         print("%s: %0.2f (+/- %0.2f)" % (
                             score, np.array(scores[score]).mean(), np.array(scores[score]).std() * 2))
 
-            return (all_scores, data, collected_y_pred, collected_y_test)
+            return (all_scores, data, y_pred_all, y_test_all)
 
         ##########
 

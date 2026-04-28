@@ -285,12 +285,12 @@ def plot_pca_scatter_comparison(datasets_dict, dataset_labels, class_names=None,
         X = dataset.X
         y = dataset.y
 
-        pc2 = X[:, 1] if X.shape[1] > 1 else np.zeros(len(X))
+        pc2_values = X[:, 1] if X.shape[1] > 1 else np.zeros(len(X))
         for class_idx, class_name in enumerate(class_names):
             mask = np.array(y) == class_idx
             ax.scatter(
                 X[mask, 0],
-                pc2[mask],
+                pc2_values[mask],
                 label=class_name,
                 alpha=0.7,
                 s=30,
