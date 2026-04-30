@@ -13,7 +13,7 @@ insert conclusio
 dev_mode = False
 grid_data_folder = os.path.join(os.getcwd(), 'raw_data_generation', 'input')
 raw_data_folder = os.path.join(os.getcwd(), 'raw_data')
-data_path = os.path.join(os.getcwd(), raw_data_folder, 'MASTER_THESIS_DATASET_feature_engineering')
+data_path = os.path.join(os.getcwd(), raw_data_folder, 'MASTER_THESIS_DATASET_feature_engineering') # MASTER_THESIS_DATASET_feature_engineering oder MASTER_THESIS_DATASET
 sim_data_path = os.path.join(os.getcwd(), raw_data_folder, 'ERIGrid_phase_1_sim_data')
 datasets_folder = os.path.join(os.getcwd(), 'datasets')
 test_data_folder = os.path.join(os.getcwd(), 'test')

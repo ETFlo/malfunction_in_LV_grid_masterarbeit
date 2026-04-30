@@ -21,29 +21,41 @@
 # Florian Liszt
 measurements = {
     'measurements correct control Setup A': [
-        'output_1_A_c', 'output_2_A_c', 'output_3_A_c', 
+        'output_1_A_c','output_2_A_c',
+        'output_3_A_c', 
         'output_4_A_c', 'output_5_A_c', 'output_6_A_c',
         'output_7_A_c', 'output_8_A_c', 'output_9_A_c',
         'output_10_A_c', 'output_11_A_c', 'output_12_A_c',
         'output_13_A_c', 'output_14_A_c', 'output_15_A_c',
         'output_16_A_c', 'output_17_A_c', 'output_18_A_c',
         'output_19_A_c', 
-        'output_20_1_A_c','output_20_2_A_c',
-        'output_20_3_A_c', 'output_20_4_A_c','output_20_5_A_c',
-        'output_20_6_A_c','output_20_7_A_c',
+        #'output_20_1_A_c',
+        #'output_20_2_A_c',
+        #'output_20_3_A_c',
+        #'output_20_4_A_c',
+        #'output_20_5_A_c',
+        #'output_20_6_A_c',
+        #'output_20_7_A_c',
+        #'output_20_A_c',
         'output_21_A_c', 'output_22_A_c'
     ],
     'measurements wrong control Setup A': [
-        'output_1_A_w', 'output_2_A_w', 'output_3_A_w', 
+        'output_1_A_w', 'output_2_A_w',
+        'output_3_A_w', 
         'output_4_A_w', 'output_5_A_w', 'output_6_A_w',
         'output_7_A_w', 'output_8_A_w', 'output_9_A_w',
         'output_10_A_w', 'output_11_A_w', 'output_12_A_w',
         'output_13_A_w', 'output_14_A_w', 'output_15_A_w',
         'output_16_A_w', 'output_17_A_w', 'output_18_A_w',
         'output_19_A_w',
-        'output_20_1_A_w','output_20_2_A_w',
-        'output_20_3_A_w', 'output_20_4_A_w','output_20_5_A_w',
-        'output_20_6_A_w','output_20_7_A_w', 
+        #'output_20_1_A_w',
+        #'output_20_2_A_w',
+        #'output_20_3_A_w',
+        #'output_20_4_A_w',
+        #'output_20_5_A_w',
+        #'output_20_6_A_w',
+        #'output_20_7_A_w',
+        #'output_20_A_w',
         'output_21_A_w', 'output_22_A_w'
     ]
 }
@@ -102,6 +114,7 @@ class Variables():
             'ortsnetztrafo_Frequenz', 'ortsnetztrafo_Scheinleistung_gesamt', 'ortsnetztrafo_Wirkleistung_gesamt', 
             'ortsnetztrafo_Blindleistung_gesamt', 'ortsnetztrafo_Leistungsfaktor_gesamt'
             ,'ortsnetztrafo_Spannungshub_rolling','ortsnetztrafo_Spannung_Varianz_rolling','ortsnetztrafo_P_max_rolling','ortsnetztrafo_P_min_rolling', 'ortsnetztrafo_Grenzwertverletzungen_rolling', 'ortsnetztrafo_CosPhi_Mittel_rolling'
+            , 'ortsnetztrafo_Spannung_Skew_rolling','ortsnetztrafo_Spannung_Kurtosis_rolling','ortsnetztrafo_P_Ramp_Rate_rolling','ortsnetztrafo_U_P_Korrelation_rolling','ortsnetztrafo_Phasen_Schieflast_rolling'
         ]
         
         
@@ -120,6 +133,7 @@ class Variables():
             'smartmeter_Powerfactor gesamt', 'smartmeter_Powerfactor Phase 1', 'smartmeter_Powerfactor Phase 2', 'smartmeter_Powerfactor Phase 3', 
             'smartmeter_Frequenz'
             ,'smartmeter_Spannungshub_rolling','smartmeter_Spannung_Varianz_rolling','smartmeter_P_max_rolling','smartmeter_P_min_rolling', 'smartmeter_Grenzwertverletzungen_rolling', 'smartmeter_CosPhi_Mittel_rolling'
+            , 'smartmeter_Spannung_Skew_rolling','smartmeter_Spannung_Kurtosis_rolling','smartmeter_P_Ramp_Rate_rolling','smartmeter_U_P_Korrelation_rolling','smartmeter_Phasen_Schieflast_rolling'
         ]   
         
         self.pca_variables_F1 = self.variables_F1.copy()
