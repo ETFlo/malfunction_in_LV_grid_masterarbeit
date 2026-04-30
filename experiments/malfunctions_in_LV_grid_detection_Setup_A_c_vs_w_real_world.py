@@ -33,7 +33,7 @@ learning_config = {
     'data_source': 'real_world', #real_world, simulation
     'setup_chosen' : 'Setup_A_F1_data',  # for assembly or clustering # Setup_A_F2_data -> Trafo oder Setup_A_F1_data -> Smart Meter
     'mode' : 'classification',  # classification means wrong as wrong and inversed as inversed, detection means wrong and inversed as wrong
-    'data_mode' : 'combined_data',  # 'measurement_wise', 'combined_data'
+    'data_mode' : 'measurement_wise',  # 'measurement_wise', 'combined_data'
     'selection' : 'most important', # 'most important', 'least important' variables picked after assessment by PCA > only applicable when in measurement_wise data mode
     'approach' : 'PCA+clf',  # 'PCA+clf', 'clustering'
     'clf' : 'Assembly', # SVM, NuSVM, kNN, Assembly
@@ -57,7 +57,7 @@ add_data = True  # raw_data_available = False has to be set for this! set add_da
 #dataset_available = True  # set to False to recreate instances from raw data
 detection_methods = True
 deeplearning = False
-plot_data = False
+plot_data = True
 test_bays = ['F1', 'F2']  # B1 gelöscht
 extended = False #also add inversed curve to Setup A simulations
 save_figures = True # save figures of data

@@ -419,29 +419,25 @@ class Transformer_detection:
             results_pca = self.pca(variables=self.variables, PCA_type='PCA', analyse=True,
                                    sampling=self.sampling_step_size_in_seconds)
             variable_selection = self.find_most_common_PCs(
-                results_pca)  # , number_of_variables = 15)   #returns the most important variables for the PCA per measurement point > use to to do PCA and then SVM
+                results_pca)  # returns dict keyed by bay name; most important variables for PCA per measurement point
             if self.plot_data:
                 fgs_pca, axs_pca = self.pca_plotting(results_pca, type='PCA',
-                                                     number_of_vars=len(self.variables['B1'][1]))
+                                                     number_of_vars=max(len(self.variables[k][1]) for k in self.variables))
 
             if self.selection == 'most important':
-                variable_selection = {'B1': [v.variables_B1, [i[0] for i in variable_selection[0]]],
-                                      'F1': [v.variables_F1, [i[0] for i in variable_selection[1]]],
-                                      'F2': [v.variables_F2, [i[0] for i in variable_selection[2]]]}
+                variable_selection = {bay: [self.variables[bay][0], [i[0] for i in variable_selection[bay]]]
+                                      for bay in variable_selection if bay in self.variables}
             if self.selection == 'least important':
-                pca_variables_B1 = self.remove_objects_in_list_from_list(v.pca_variables_B1, variable_selection[0])
-                pca_variables_F1 = self.remove_objects_in_list_from_list(v.pca_variables_F1, variable_selection[1])
-                pca_variables_F2 = self.remove_objects_in_list_from_list(v.pca_variables_F2, variable_selection[2])
-                variable_selection = {'B1': [v.variables_B1, pca_variables_B1],
-                                      'F1': [v.variables_F1, pca_variables_F1],
-                                      'F2': [v.variables_F2, pca_variables_F2]}
+                variable_selection = {bay: [self.variables[bay][0],
+                                            self.remove_objects_in_list_from_list(list(self.variables[bay][1]),
+                                                                                   variable_selection[bay])]
+                                      for bay in variable_selection if bay in self.variables}
 
             if self.plot_data:
                 results_pca = self.pca(variables=variable_selection, PCA_type='PCA',
                                        sampling=self.sampling_step_size_in_seconds)
                 fgs_pca, axs_pca = self.pca_plotting(results_pca, type='PCA', number_of_vars=max(
-                    [len(variable_selection['B1'][1]), len(variable_selection['F1'][1]),
-                     len(variable_selection['F2'][1])]))
+                    len(variable_selection[k][1]) for k in variable_selection))
 
         # results_pca = pca(variables=variable_selection, type='PCA', n_components=len(variable_selection['B1'][1]))
         scores_by_n = {}
@@ -722,53 +718,22 @@ class Transformer_detection:
         return results
 
     def find_most_common_PCs(self, results_pca):  # , number_of_variables=15):
-        """results_B1 = [print(
-            key + ': #components: ' + str(results_pca[key][2]) + '; most important components: ' + str(results_pca[key][3]))
-                      for key in results_pca if key[-2:] == 'B1']"""
+        result = {}
 
-        min_number_of_dimensions_B1 = min([results_pca[i][2] for i in results_pca if i[
-                                                                                     -2:] == 'B1'])  # get lowest number of dimensions needed to capture 99% of variance
-        number_of_variables_B1 = min_number_of_dimensions_B1
+        for bay in ['B1', 'F1', 'F2']:
+            dims = [results_pca[i][2] for i in results_pca if i[-2:] == bay]
+            if not dims:
+                continue
+            n = min(dims)
+            most_common = []
+            for most_important in [results_pca[key][3] for key in results_pca if key[-2:] == bay]:
+                most_common = most_common + most_important[:n]
+            a_counter = collections.Counter(most_common)
+            most_common = a_counter.most_common(n)
+            print(f'most common most important variables for PCA for {bay}: ' + str(most_common))
+            result[bay] = most_common
 
-        min_number_of_dimensions_F1 = min([results_pca[i][2] for i in results_pca if i[
-                                                                                     -2:] == 'F1'])  # get lowest number of dimensions needed to capture 99% of variance
-        number_of_variables_F1 = min_number_of_dimensions_F1
-
-        min_number_of_dimensions_F2 = min([results_pca[i][2] for i in results_pca if i[
-                                                                                     -2:] == 'F2'])  # get lowest number of dimensions needed to capture 99% of variance
-        number_of_variables_F2 = min_number_of_dimensions_F2
-
-        most_common_B1 = []
-        least_common_B1 = []
-        for most_important in [results_pca[key][3] for key in results_pca if key[-2:] == 'B1']:
-            most_common_B1 = most_common_B1 + most_important[:number_of_variables_B1]
-            # least_common_B1 = most_common_B1 + most_important[:number_of_variables_B1]
-        a_counter = collections.Counter(most_common_B1)
-        most_common_B1 = a_counter.most_common(number_of_variables_B1)
-        print('most common most important variables for PCA for B1: ' + str(most_common_B1))
-
-        """results_F1 = [print(
-            key + ': #components: ' + str(results_pca[key][2]) + '; most important components: ' + str(results_pca[key][3]))
-                      for key in results_pca if key[-2:] == 'F1']"""
-        most_common_F1 = []
-        for most_important in [results_pca[key][3] for key in results_pca if key[-2:] == 'F1']:
-            most_common_F1 = most_common_F1 + most_important[:number_of_variables_F1]
-        a_counter = collections.Counter(most_common_F1)
-        most_common_F1 = a_counter.most_common(number_of_variables_F1)
-        print('most common most important variables for PCA for F1: ' + str(most_common_F1))
-
-        """results_F2 = [print(
-            key + ': #components: ' + str(results_pca[key][2]) + '; most important components: ' + str(results_pca[key][3]))
-                      for key in results_pca if key[-2:] == 'F2']"""
-        most_common_F2 = []
-        for most_important in [results_pca[key][3] for key in results_pca if key[-2:] == 'F2']:
-            most_common_F2 = most_common_F2 + most_important[:number_of_variables_F2]
-        a_counter = collections.Counter(most_common_F2)
-        most_common_F2 = a_counter.most_common(number_of_variables_F2)
-        print('most common most important variables for PCA for F2: ' + str(
-            most_common_F2))  # each occurence means that the variable is the most important for a component of the PCA
-
-        return most_common_B1, most_common_F1, most_common_F2
+        return result
 
     def pca_plotting(self, results, type='PCA', number_of_vars=len(v.pca_variables_B1)):
         explained_variances = {}
